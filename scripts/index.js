@@ -7,6 +7,7 @@ const addCard = (name, link) => {
 
   cardElement.querySelector('.card__title').textContent = name;
   cardElement.querySelector('.card__image').setAttribute("src", link);
+  cardElement.querySelector('.card__image').setAttribute("alt", `фотография ${name}`);
 
   cardDeleteButton.addEventListener('click', () => {
     cardElement.remove();
@@ -15,7 +16,6 @@ const addCard = (name, link) => {
   return cardElement;
 };
 
-initialCards.forEach(card => {
-  const cardElement = addCard(card.name, card.link);
-  cardList.append(cardElement);
-});
+initialCards.forEach(card =>
+  cardList.append(addCard(card.name, card.link))
+);
