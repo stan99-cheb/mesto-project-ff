@@ -1,10 +1,11 @@
 import { Card } from "./components/Card/card";
-import { cardSelectors } from "./utils/constants";
-import initialCards from "./data/cards-data.json";
+import { selectors } from "./utils/selectors";
+import initialCards from "./data/cards-data";
 import './index.css';
 
-const cardList = document.querySelector('.places__list');
+const cardList = document.querySelector(`.${selectors.cardsPlace}`);
 
+// -------------------------------- Колбэки Card --------------------------------
 const cardDel = (cardData) => {
   console.log(`Карточка ${cardData.name} удалена`);
 };
@@ -16,12 +17,9 @@ const cardLike = (cardLikeButton) => {
 const cardShow = (cardImage) => {
   console.log(cardImage);
 };
+// ------------------------------------------------------------------------------
 
-const renderCard = (cardData, method = 'prepend') => {
-  const card = new Card(cardSelectors, cardData, cardDel, cardLike, cardShow);
-  cardList[method](card.create());
-};
-
-initialCards.forEach(cardData => {
-  renderCard(cardData, 'append');
+initialCards.forEach(dataCard => {
+  const card = new Card(selectors.card, dataCard, cardDel, cardLike, cardShow);
+  card.render(cardList, card.create(), 'append');
 });
