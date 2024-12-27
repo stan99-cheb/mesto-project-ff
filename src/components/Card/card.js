@@ -1,28 +1,35 @@
-import { selectors } from "../../utils/selectors";
-
-const cardTemplate = document.querySelector(`#${selectors.temlate.card}`).content;
-
+import { checkTypes } from '../../utils/check-types';
+import { data } from '../../utils/constants';
+/**
+ * Конструктор для карточки
+ * @param {object} selectors 
+ * @param {object} cardData 
+ * @param {function} cbDelete 
+ * @param {function} cbLike 
+ * @param {function} cbShow 
+ * @returns {object} объект с методами create, render
+ */
 export function Card(selectors, cardData, cbDelete, cbLike, cbShow) {
-  this.cardElement = cardTemplate.querySelector(`.${selectors.card}`).cloneNode(true);
+  checkTypes(arguments, ['object', 'object', 'function', 'function', 'function']);
+
+  this.cardElement = data.cardTemplate.querySelector(`.${selectors.element}`).cloneNode(true);
   this.cardDeleteButton = this.cardElement.querySelector(`.${selectors.deleteButton}`);
   this.cardLikeButton = this.cardElement.querySelector(`.${selectors.likeButton}`);
   this.cardImage = this.cardElement.querySelector(`.${selectors.image}`);
 
-  this.cardElement.querySelector(`.${selectors.title}`).textContent = cardData.name;
-  this.cardElement.querySelector(`.${selectors.image}`).src = cardData.link;
-  this.cardElement.querySelector(`.${selectors.image}`).alt = `фотография ${cardData.name}`;
-
-  this.setEventListener = (element, type, callback, options = {}) => {
-    element.addEventListener(type, callback, options);
-  };
+  this.cardElement.querySelector(`.${selectors.title}`).textContent = cardData['place-name'];
+  this.cardElement.querySelector(`.${selectors.image}`).src = cardData['link'];
+  this.cardElement.querySelector(`.${selectors.image}`).alt = `фотография ${cardData['place-name']}`;
 
   this.create = () => {
     return this.cardElement;
   };
 
   this.delete = () => {
-    this.cardElement.remove();
+    this.cardLikeButton.removeEventListener('click', this.like);
+    this.cardImage.removeEventListener('click', this.show);
     cbDelete(cardData);
+    this.cardElement.remove();
   };
 
   this.like = () => {
@@ -30,16 +37,23 @@ export function Card(selectors, cardData, cbDelete, cbLike, cbShow) {
   };
 
   this.show = () => {
-    cbShow(this.cardImage);
+    cbShow({
+      src: this.cardImage.src,
+      alt: this.cardImage.alt,
+      caption: this.cardImage.alt,
+    });
   };
 
-  this.render = (cardList, card, method = 'prepend') => {
-    cardList[method](card);
+  this.render = (...args) => {
+    args.length === 1 && args.push('prepend');
+    checkTypes(args, ['htmlulistelement', 'string']);
+    const [cardList, method] = args;
+    cardList[method](this.cardElement);
   };
 
-  this.setEventListener(this.cardDeleteButton, 'click', this.delete, { once: true });
-  this.setEventListener(this.cardLikeButton, 'click', this.like);
-  this.setEventListener(this.cardImage, 'click', this.show);
+  this.cardDeleteButton.addEventListener('click', this.delete, { once: true });
+  this.cardLikeButton.addEventListener('click', this.like);
+  this.cardImage.addEventListener('click', this.show);
 
   return {
     create: this.create,
