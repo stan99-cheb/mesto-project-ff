@@ -7,15 +7,14 @@ import { checkTypes } from "../../utils/check-types";
  * @param {boolean} isAnimated 
  * @returns {object} объект с методами open, close
  */
-export function Popup(element, buttonClose, selectors, isAnimated) {
-  checkTypes(arguments, ['htmldivelement', 'htmlbuttonelement', 'object', 'boolean']);
+export function Popup(element, selectors, isAnimated) {
+  checkTypes(arguments, ['htmldivelement', 'object', 'boolean']);
 
-  this.element = element;
-  this.buttonClose = buttonClose;
-  isAnimated && this.element.classList.add(selectors.isAnimated);
+  this.buttonClose = element.querySelector(`.${selectors.buttonClose}`);
+  isAnimated && element.classList.add(selectors.isAnimated);
 
   this.handleClick = (e) => {
-    this.element.isEqualNode(e.target) && this.close();
+    element.isEqualNode(e.target) && this.close();
   };
 
   this.handleEscKey = (e) => {
@@ -23,14 +22,14 @@ export function Popup(element, buttonClose, selectors, isAnimated) {
   };
 
   this.open = () => {
-    this.element.classList.toggle(selectors.open);
-    this.element.addEventListener('click', this.handleClick);
+    element.classList.toggle(selectors.open);
+    element.addEventListener('click', this.handleClick);
     document.addEventListener('keydown', this.handleEscKey);
   };
 
   this.close = () => {
-    this.element.classList.toggle(selectors.open);
-    this.element.removeEventListener('click', this.handleClick);
+    element.classList.toggle(selectors.open);
+    element.removeEventListener('click', this.handleClick);
     document.removeEventListener('keydown', this.handleEscKey);
   };
 
