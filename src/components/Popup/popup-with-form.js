@@ -1,41 +1,67 @@
+import { checkTypes } from "../../utils/check-types";
 import { Popup } from "./popup";
 import { selectors } from "../../utils/selectors";
-import { checkTypes } from "../../utils/check-types";
 /**
  * Конструктор для попапа с формой
  * @param {object} selectorsPopupWithForm 
  * @param {function} cbHandleSubmit 
- * @returns {object} объект с методами open, close, setValues
+ * @returns {object} объект с методами open, close, setValues, setValidate
  */
 export function PopupWithForm(selectorsPopupWithForm, cbHandleSubmit) {
   checkTypes(arguments, ['object', 'function']);
 
   this.element = document.querySelector(`.${selectorsPopupWithForm.element}`);
-  this.buttonClose = this.element.querySelector(`.${selectorsPopupWithForm.buttonClose}`);
-  this.popup = new Popup(this.element, this.buttonClose, selectors.popup, selectorsPopupWithForm.isAnimated);
+  this.popup = new Popup(this.element, selectors.popup, selectorsPopupWithForm.isAnimated);
   this.form = document.forms[selectorsPopupWithForm.formName];
+  this.inputs = [...this.form.querySelectorAll('input')];
+  this.buttonSubmit = this.form.querySelector('button[type="submit"]');
+
+  this.toggleButton = () => {
+    this.form.checkValidity()
+      ? this.buttonSubmit.removeAttribute('disabled')
+      : this.buttonSubmit.setAttribute('disabled', '');
+  };
+
+  this.setValidate = (...args) => {
+    checkTypes(args, ['function', 'function']);
+    const [cbHideError, cbShowError] = args;
+
+    !this.form.checkValidity() && this.buttonSubmit.setAttribute('disabled', '');
+    this.inputs.forEach(
+      input => {
+        input.addEventListener('input', () => {
+          input.validity.valid
+            ? cbHideError(input)
+            : cbShowError(input)
+          this.toggleButton();
+        });
+      }
+    );
+  };
 
   this.getValues = () =>
-    [...this.form.elements].reduce(
-      (acc, element) =>
-        !!element.name
-          ? { ...acc, [element.name]: element.value }
-          : acc,
+    this.inputs.reduce(
+      (acc, input) =>
+        ({ ...acc, [input.name]: input.value }),
       {}
     );
 
-  this.setValues = (formData) => {
+  this.setValues = (...args) => {
+    checkTypes(args, ['object']);
+    const [formData] = args;
+
     Object.keys(formData).forEach(
-      key => {
+      (key) => {
         this.form[key].value = formData[key];
       }
-    )
+    );
   };
 
   this.handleSubmit = (e) => {
     e.preventDefault();
     cbHandleSubmit(this.getValues());
     this.form.reset();
+    this.popup.close();
   };
 
   this.form.addEventListener('submit', this.handleSubmit);
@@ -43,6 +69,9 @@ export function PopupWithForm(selectorsPopupWithForm, cbHandleSubmit) {
   return Object.create(this.popup, {
     setValues: {
       value: this.setValues,
+    },
+    setValidate: {
+      value: this.setValidate,
     },
   });
 };

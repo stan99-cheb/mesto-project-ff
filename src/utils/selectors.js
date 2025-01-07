@@ -21,25 +21,26 @@ export const selectors = {
   },
   popup: {
     open: 'popup_is-opened',
+    buttonClose: 'popup__close',
     isAnimated: 'popup_is-animated',
   },
   popupWithImage: {
     element: 'popup_type_image',
-    buttonClose: 'popup__close',
     image: 'popup__image',
     caption: 'popup__caption',
     isAnimated: true,
   },
   popupAddCard: {
     element: 'popup_type_new-card',
-    buttonClose: 'popup__close',
     formName: 'new-place',
     isAnimated: true,
   },
   popupEditProfile: {
     element: 'popup_type_edit',
-    buttonClose: 'popup__close',
     formName: 'edit-profile',
     isAnimated: true,
+  },
+  validate: {
+    error: 'popup__input-error',
   },
 };
