@@ -8,8 +8,8 @@ import { data } from '../../utils/constants';
  * @param {function} cbShow 
  * @returns {object} объект с методами create, render
  */
-export function Card(selectors, cbDelete, cbLike, cbShow) {
-  checkTypes(arguments, ['object', 'function', 'function', 'function']);
+export function Card(cardData, selectors, cbDelete, cbLike, cbShow) {
+  checkTypes(arguments, ['object', 'object', 'function', 'function', 'function']);
 
   this.cardElement = data.cardTemplate.querySelector(`.${selectors.element}`).cloneNode(true);
   this.cardDeleteButton = this.cardElement.querySelector(`.${selectors.deleteButton}`);
@@ -18,23 +18,14 @@ export function Card(selectors, cbDelete, cbLike, cbShow) {
   this.cardTitle = this.cardElement.querySelector(`.${selectors.title}`);
   this.cardLink = this.cardElement.querySelector(`.${selectors.image}`);
 
-  this.create = (...args) => {
-    checkTypes(args, ['object']);
-    const [cardData] = args;
-
-    this.cardTitle.textContent = cardData.title;
-    this.cardLink.src = cardData.link;
-    this.cardLink.alt = cardData.description;
-  };
+  this.cardTitle.textContent = cardData[data.cardInfo.name];
+  this.cardLink.src = cardData[data.cardInfo.link];
+  this.cardLink.alt = cardData[data.cardInfo.name];
 
   this.delete = () => {
     this.cardLikeButton.removeEventListener('click', this.like);
     this.cardImage.removeEventListener('click', this.show);
-    cbDelete({
-      title: this.cardTitle.textContent,
-      link: this.cardLink.src,
-      description: this.cardLink.alt,
-    });
+    cbDelete(cardData);
     this.cardElement.remove();
   };
 
@@ -43,11 +34,7 @@ export function Card(selectors, cbDelete, cbLike, cbShow) {
   };
 
   this.show = () => {
-    cbShow({
-      src: this.cardImage.src,
-      alt: this.cardImage.alt,
-      caption: this.cardImage.alt,
-    });
+    cbShow(cardData);
   };
 
   this.render = (...args) => {
@@ -63,7 +50,6 @@ export function Card(selectors, cbDelete, cbLike, cbShow) {
   this.cardImage.addEventListener('click', this.show);
 
   return {
-    create: this.create,
     render: this.render,
   }
 };
