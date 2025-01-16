@@ -1,4 +1,5 @@
 import { checkTypes } from "../../utils/check-types";
+import { data } from "../../utils/constants";
 import { Popup } from "./popup";
 import { selectors } from "../../utils/selectors";
 /**
@@ -16,11 +17,11 @@ export function PopupWithImage(selectorsPopupWithImage) {
 
   this.show = (...args) => {
     checkTypes(args, ['object']);
-    const [{ src, alt, caption }] = args;
+    const [cardImageData] = args;
 
-    this.image.src = src;
-    this.image.alt = alt;
-    this.caption.textContent = caption;
+    this.image.src = cardImageData[data.cardInfo.link];
+    this.image.alt = cardImageData[data.cardInfo.name];
+    this.caption.textContent = cardImageData[data.cardInfo.name];
   };
 
   return Object.create(this.popup, {

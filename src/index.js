@@ -15,12 +15,7 @@ const popupAddCard = new PopupWithForm(
     checkTypes(args, ['object']);
     const [cardData] = args;
 
-    const card = new Card(selectors.card, cardDel, cardLike, cardShow);
-    card.create({
-      title: cardData['place-name'],
-      link: cardData['link'],
-      description: `фотография ${cardData['place-name']}`,
-    });
+    const card = new Card(cardData, selectors.card, cardDel, cardLike, cardShow);
     card.render(data.cardList);
   }
 );
@@ -74,7 +69,7 @@ const cardDel = (...args) => {
   checkTypes(args, ['object']);
   const [cardData] = args;
 
-  console.log(`Карточка "${cardData.title}" удалена`);
+  console.log(`Карточка "${cardData[data.cardInfo.name]}" удалена`);
 };
 
 const cardLike = (...args) => {
@@ -94,11 +89,6 @@ const cardShow = (...args) => {
 // ------------------------------------------------------------------------------
 
 initialCards.forEach(cardData => {
-  const card = new Card(selectors.card, cardDel, cardLike, cardShow);
-  card.create({
-    title: cardData['place-name'],
-    link: cardData['link'],
-    description: `фотография ${cardData['place-name']}`,
-  });
+  const card = new Card(cardData, selectors.card, cardDel, cardLike, cardShow);
   card.render(data.cardList, 'append');
 });

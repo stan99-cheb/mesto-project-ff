@@ -11,4 +11,8 @@ export const data = {
     title: document.querySelector(`.${selectors.userInfo.title}`),
     description: document.querySelector(`.${selectors.userInfo.description}`),
   },
+  cardInfo: {
+    name: 'place-name',
+    link: 'link',
+  },
 };
