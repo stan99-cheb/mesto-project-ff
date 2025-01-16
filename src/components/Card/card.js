@@ -3,27 +3,24 @@ import { data } from '../../utils/constants';
 /**
  * Конструктор для карточки
  * @param {object} selectors 
- * @param {object} cardData 
  * @param {function} cbDelete 
  * @param {function} cbLike 
  * @param {function} cbShow 
  * @returns {object} объект с методами create, render
  */
-export function Card(selectors, cardData, cbDelete, cbLike, cbShow) {
+export function Card(cardData, selectors, cbDelete, cbLike, cbShow) {
   checkTypes(arguments, ['object', 'object', 'function', 'function', 'function']);
 
   this.cardElement = data.cardTemplate.querySelector(`.${selectors.element}`).cloneNode(true);
   this.cardDeleteButton = this.cardElement.querySelector(`.${selectors.deleteButton}`);
   this.cardLikeButton = this.cardElement.querySelector(`.${selectors.likeButton}`);
   this.cardImage = this.cardElement.querySelector(`.${selectors.image}`);
+  this.cardTitle = this.cardElement.querySelector(`.${selectors.title}`);
+  this.cardLink = this.cardElement.querySelector(`.${selectors.image}`);
 
-  this.cardElement.querySelector(`.${selectors.title}`).textContent = cardData['place-name'];
-  this.cardElement.querySelector(`.${selectors.image}`).src = cardData['link'];
-  this.cardElement.querySelector(`.${selectors.image}`).alt = `фотография ${cardData['place-name']}`;
-
-  this.create = () => {
-    return this.cardElement;
-  };
+  this.cardTitle.textContent = cardData[data.cardInfo.name];
+  this.cardLink.src = cardData[data.cardInfo.link];
+  this.cardLink.alt = cardData[data.cardInfo.name];
 
   this.delete = () => {
     this.cardLikeButton.removeEventListener('click', this.like);
@@ -37,17 +34,14 @@ export function Card(selectors, cardData, cbDelete, cbLike, cbShow) {
   };
 
   this.show = () => {
-    cbShow({
-      src: this.cardImage.src,
-      alt: this.cardImage.alt,
-      caption: this.cardImage.alt,
-    });
+    cbShow(cardData);
   };
 
   this.render = (...args) => {
     args.length === 1 && args.push('prepend');
     checkTypes(args, ['htmlulistelement', 'string']);
     const [cardList, method] = args;
+
     cardList[method](this.cardElement);
   };
 
@@ -56,7 +50,6 @@ export function Card(selectors, cardData, cbDelete, cbLike, cbShow) {
   this.cardImage.addEventListener('click', this.show);
 
   return {
-    create: this.create,
     render: this.render,
   }
 };

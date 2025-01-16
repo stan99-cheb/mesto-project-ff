@@ -13,10 +13,10 @@ const popupAddCard = new PopupWithForm(
   selectors.popupAddCard,
   (...args) => {
     checkTypes(args, ['object']);
-    const [dataCard] = args;
-    const card = new Card(selectors.card, dataCard, cardDel, cardLike, cardShow);
+    const [cardData] = args;
+
+    const card = new Card(cardData, selectors.card, cardDel, cardLike, cardShow);
     card.render(data.cardList);
-    popupAddCard.close();
   }
 );
 
@@ -25,21 +25,42 @@ const popupEditProfile = new PopupWithForm(
   (...args) => {
     checkTypes(args, ['object']);
     const [dataProfile] = args;
+
     data.userInfo.title.textContent = dataProfile['title'];
     data.userInfo.description.textContent = dataProfile['description'];
-    popupEditProfile.close();
   }
 );
 // ------------------------------------------------------------------------------
 
+// ------------------------- Колбэки проверки валидации -------------------------
+const hideError = (...args) => {
+  checkTypes(args, ['htmlinputelement']);
+  const [input] = args;
+
+  input.classList.remove(selectors.validate.error);
+};
+
+const showError = (...args) => {
+  checkTypes(args, ['htmlinputelement']);
+  const [input] = args;
+
+  input.classList.add(selectors.validate.error);
+};
+// ------------------------------------------------------------------------------
+
 // -------------------------------- Слушатели кнопок --------------------------------
-data.buttons.addCard.addEventListener('click', popupAddCard.open);
 data.buttons.editProfile.addEventListener('click', () => {
   popupEditProfile.setValues({
     'title': data.userInfo.title.textContent,
     'description': data.userInfo.description.textContent,
   });
+  popupEditProfile.setValidate(hideError, showError);
   popupEditProfile.open();
+});
+
+data.buttons.addCard.addEventListener('click', () => {
+  popupAddCard.setValidate(hideError, showError);
+  popupAddCard.open();
 });
 // ------------------------------------------------------------------------------
 
@@ -47,24 +68,27 @@ data.buttons.editProfile.addEventListener('click', () => {
 const cardDel = (...args) => {
   checkTypes(args, ['object']);
   const [cardData] = args;
-  console.log(`Карточка ${cardData['place-name']} удалена`);
+
+  console.log(`Карточка "${cardData[data.cardInfo.name]}" удалена`);
 };
 
 const cardLike = (...args) => {
   checkTypes(args, ['htmlbuttonelement']);
   const [cardLikeButton] = args;
+
   cardLikeButton.classList.toggle(selectors.card.isLiked);
 };
 
 const cardShow = (...args) => {
   checkTypes(args, ['object']);
   const [cardImageData] = args;
+
   popupWithImage.show(cardImageData);
   popupWithImage.open();
 };
 // ------------------------------------------------------------------------------
 
-initialCards.forEach(dataCard => {
-  const card = new Card(selectors.card, dataCard, cardDel, cardLike, cardShow);
+initialCards.forEach(cardData => {
+  const card = new Card(cardData, selectors.card, cardDel, cardLike, cardShow);
   card.render(data.cardList, 'append');
 });
