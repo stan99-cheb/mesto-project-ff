@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mesto</title>
-  <link rel="stylesheet" href="./src/index.css">
 </head>
 
 <body class="page">
@@ -37,10 +36,17 @@
       <div class="popup__content">
         <button type="button" class="popup__close"></button>
         <h3 class="popup__title">Редактировать профиль</h3>
-        <form class="popup__form" name="edit-profile">
-          <input type="text" name="title" class="popup__input popup__input_type_name" placeholder="Имя" required>
-          <input type="text" name="description" class="popup__input popup__input_type_description" placeholder="Занятие"
+        <form class="popup__form" name="edit-profile" novalidate>
+          <input type="text" name="title" class="popup__input popup__input_type_name" placeholder="Имя"
+            pattern="[а-яёА-ЯЁ\w\s\-]{2,40}"
+            data-error-message="Поле может содержать только латинские и кириллические буквы, знаки дефиса и пробелы"
             required>
+          <small class="title-input-error popup__input-error"></small>
+          <input type="text" name="description" class="popup__input popup__input_type_description" placeholder="Занятие"
+            pattern="[а-яёА-ЯЁ\w\s\-]{2,200}"
+            data-error-message="Поле может содержать только латинские и кириллические буквы, знаки дефиса и пробелы"
+            required>
+          <small class="description-input-error popup__input-error"></small>
           <button type="submit" class="button popup__button">Сохранить</button>
         </form>
       </div>
@@ -49,11 +55,15 @@
       <div class="popup__content">
         <button type="button" class="popup__close"></button>
         <h3 class="popup__title">Новое место</h3>
-        <form class="popup__form" name="new-place">
+        <form class="popup__form" name="new-place" novalidate>
           <input type="text" name="place-name" class="popup__input popup__input_type_card-name" placeholder="Название"
+            pattern="[а-яёА-ЯЁ\w\s\-]{2,30}"
+            data-error-message="Поле может содержать только латинские и кириллические буквы, знаки дефиса и пробелы"
             required>
+          <small class="place-name-input-error popup__input-error"></small>
           <input type="url" name="link" class="popup__input popup__input_type_url" placeholder="Ссылка на картинку"
             required>
+          <small class="link-input-error popup__input-error"></small>
           <button type="submit" class="button popup__button">Сохранить</button>
         </form>
       </div>

@@ -30,6 +30,9 @@ export function PopupWithForm(selectorsPopupWithForm, cbHandleSubmit) {
     this.inputs.forEach(
       input => {
         input.addEventListener('input', () => {
+          input.validity.patternMismatch
+            ? input.setCustomValidity(input.dataset.errorMessage)
+            : input.setCustomValidity('')
           input.validity.valid
             ? cbHideError(input)
             : cbShowError(input)
