@@ -1,6 +1,8 @@
+import './index.css';
 import { Card } from "./components/Card/card";
 import { checkTypes } from "./utils/check-types";
 import { data } from "./utils/constants";
+import { handleHideError, handleShowError } from './components/Validate/validate';
 import { PopupWithForm } from "./components/Popup/popup-with-form";
 import { PopupWithImage } from "./components/Popup/popup-with-image";
 import { selectors } from "./utils/selectors";
@@ -32,34 +34,18 @@ const popupEditProfile = new PopupWithForm(
 );
 // ------------------------------------------------------------------------------
 
-// ------------------------- Колбэки проверки валидации -------------------------
-const hideError = (...args) => {
-  checkTypes(args, ['htmlinputelement']);
-  const [input] = args;
-
-  input.classList.remove(selectors.validate.error);
-};
-
-const showError = (...args) => {
-  checkTypes(args, ['htmlinputelement']);
-  const [input] = args;
-
-  input.classList.add(selectors.validate.error);
-};
-// ------------------------------------------------------------------------------
-
 // -------------------------------- Слушатели кнопок --------------------------------
 data.buttons.editProfile.addEventListener('click', () => {
   popupEditProfile.setValues({
     'title': data.userInfo.title.textContent,
     'description': data.userInfo.description.textContent,
   });
-  popupEditProfile.setValidate(hideError, showError);
+  popupEditProfile.setValidate(handleHideError, handleShowError);
   popupEditProfile.open();
 });
 
 data.buttons.addCard.addEventListener('click', () => {
-  popupAddCard.setValidate(hideError, showError);
+  popupAddCard.setValidate(handleHideError, handleShowError);
   popupAddCard.open();
 });
 // ------------------------------------------------------------------------------
