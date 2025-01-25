@@ -7,9 +7,11 @@ export const handleHideError = (...args) => {
   checkTypes(args, ['htmlinputelement']);
   const [input] = args;
 
-  const small = document.querySelector(`.${input.name}-input-error`)
-  input.classList.remove('popup__input_type_error');
-  small.textContent = '';
+  const small = input.nextElementSibling;
+  if (small && small.tagName === 'SMALL') {
+    input.classList.remove('popup__input_type_error');
+    small.textContent = '';
+  }
 };
 /**
  * Функция для показа элементов ошибки валидации
@@ -19,7 +21,9 @@ export const handleShowError = (...args) => {
   checkTypes(args, ['htmlinputelement']);
   const [input] = args;
 
-  const small = document.querySelector(`.${input.name}-input-error`);
-  input.classList.add('popup__input_type_error');
-  small.textContent = input.validationMessage;
+  const small = input.nextElementSibling;
+  if (small && small.tagName === 'SMALL') {
+    input.classList.add('popup__input_type_error');
+    small.textContent = input.validationMessage;
+  }
 };
