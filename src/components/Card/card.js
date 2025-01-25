@@ -8,8 +8,8 @@ import { data } from '../../utils/constants';
  * @param {function} cbShow 
  * @returns {object} объект с методами create, render
  */
-export function Card(cardData, selectors, cbDelete, cbLike, cbShow) {
-  checkTypes(arguments, ['object', 'object', 'function', 'function', 'function']);
+export function Card(cardData, selectors, cbDelete, cbLike, cbShow, user) {
+  checkTypes(arguments, ['object', 'object', 'function', 'function', 'function', 'object']);
 
   this.cardElement = data.cardTemplate.querySelector(`.${selectors.element}`).cloneNode(true);
   this.cardDeleteButton = this.cardElement.querySelector(`.${selectors.deleteButton}`);
@@ -17,20 +17,31 @@ export function Card(cardData, selectors, cbDelete, cbLike, cbShow) {
   this.cardImage = this.cardElement.querySelector(`.${selectors.image}`);
   this.cardTitle = this.cardElement.querySelector(`.${selectors.title}`);
   this.cardLink = this.cardElement.querySelector(`.${selectors.image}`);
+  this.cardLikeCount = this.cardElement.querySelector(`.${selectors.count}`);
+  this.cardData = cardData;
 
   this.cardTitle.textContent = cardData[data.cardInfo.name];
   this.cardLink.src = cardData[data.cardInfo.link];
   this.cardLink.alt = cardData[data.cardInfo.name];
 
-  this.delete = () => {
+  this.addListeners = () => {
+    this.cardDeleteButton.addEventListener('click', this.delete);
+    this.cardLikeButton.addEventListener('click', this.like);
+    this.cardImage.addEventListener('click', this.show);
+  };
+
+  this.removeListeners = () => {
+    this.cardDeleteButton.removeEventListener('click', this.delete);
     this.cardLikeButton.removeEventListener('click', this.like);
     this.cardImage.removeEventListener('click', this.show);
-    cbDelete(cardData);
-    this.cardElement.remove();
+  };
+
+  this.delete = () => {
+    cbDelete(this);
   };
 
   this.like = () => {
-    cbLike(this.cardLikeButton);
+    cbLike(this.cardLikeButton, cardData._id, this.setLike);
   };
 
   this.show = () => {
@@ -45,11 +56,38 @@ export function Card(cardData, selectors, cbDelete, cbLike, cbShow) {
     cardList[method](this.cardElement);
   };
 
-  this.cardDeleteButton.addEventListener('click', this.delete, { once: true });
-  this.cardLikeButton.addEventListener('click', this.like);
-  this.cardImage.addEventListener('click', this.show);
+  this.setLike = (...args) => {
+    checkTypes(args, ['object']);
+    const [cardData] = args;
 
-  return {
-    render: this.render,
-  }
+    this.cardLikeButton.classList.toggle(selectors.isLiked);
+    this.cardLikeCount.textContent = cardData.likes.length;
+  };
+
+  !isMyCard(cardData.owner._id, user._id) && this.cardDeleteButton.remove();
+
+  hasLikeCard(cardData.likes, user._id)
+    ? this.setLike(cardData)
+    : this.cardLikeCount.textContent = cardData.likes.length;
+
+  this.cardImage.onerror = () => {
+    this.removeListeners();
+    this.cardElement.remove();
+  };
+
+  this.addListeners();
 };
+
+const isMyCard = (...args) => {
+  checkTypes(args, ['string', 'string']);
+  const [cardOwn, id] = args;
+
+  return cardOwn === id;
+};
+
+const hasLikeCard = (...args) => {
+  checkTypes(args, ['array', 'string']);
+  const [likes, id] = args;
+
+  return likes.some(item => item._id === id);
+}

@@ -3,10 +3,12 @@ export const selectors = {
   buttons: {
     addCard: 'profile__add-button',
     editProfile: 'profile__edit-button',
+    editAvatar: 'profile__avatar',
   },
   userInfo: {
     title: 'profile__title',
     description: 'profile__description',
+    avatar: 'profile__avatar',
   },
   card: {
     element: 'card',
@@ -15,6 +17,7 @@ export const selectors = {
     likeButton: 'card__like-button',
     title: 'card__title',
     isLiked: 'card__like-button_is-active',
+    count: 'card__like-count',
   },
   temlate: {
     card: 'card-template',
@@ -38,6 +41,16 @@ export const selectors = {
   popupEditProfile: {
     element: 'popup_type_edit',
     formName: 'edit-profile',
+    isAnimated: true,
+  },
+  popupEditAvatar: {
+    element: 'popup_type_avatar',
+    formName: 'edit-avatar',
+    isAnimated: true,
+  },
+  popupConfirm: {
+    element: 'popup_type_confirm',
+    formName: 'confirm',
     isAnimated: true,
   },
   validate: {
