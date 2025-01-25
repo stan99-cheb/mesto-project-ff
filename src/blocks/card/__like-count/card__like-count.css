@@ -1,0 +1,10 @@
+.card__like-count {
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 15px;
+
+  justify-self: center;
+  align-self: flex-end;
+  grid-area: count;
+}

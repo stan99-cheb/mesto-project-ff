@@ -1,13 +1,39 @@
+import './index.css';
 import { Card } from "./components/Card/card";
 import { checkTypes } from "./utils/check-types";
 import { data } from "./utils/constants";
+import { handleHideError, handleShowError } from './components/Validate/validate';
+import { PopupWithConfirm } from './components/Popup/popup-with-confirm';
 import { PopupWithForm } from "./components/Popup/popup-with-form";
 import { PopupWithImage } from "./components/Popup/popup-with-image";
 import { selectors } from "./utils/selectors";
-import initialCards from "./data/cards-data";
+import { UserInfo } from './components/User/user';
+import * as api from './components/Api/api';
+
+// -------------------------------- UserInfo --------------------------------
+const userInfo = new UserInfo({
+  name: data.userInfo.title.textContent,
+  about: data.userInfo.description.textContent,
+});
+// --------------------------------------------------------------------------
 
 // -------------------------------- Попапы --------------------------------
-const popupWithImage = new PopupWithImage(selectors.popupWithImage);
+const popupEditProfile = new PopupWithForm(
+  selectors.popupEditProfile,
+  (...args) => {
+    checkTypes(args, ['object']);
+    const [userData] = args;
+
+    popupEditProfile.loading(true, 'Сохранение...');
+    api.setUser(userData)
+      .then(userInfo.set)
+      .catch(console.log)
+      .finally(() => {
+        popupEditProfile.loading(false);
+        popupEditProfile.close();
+      });
+  }
+);
 
 const popupAddCard = new PopupWithForm(
   selectors.popupAddCard,
@@ -15,68 +41,87 @@ const popupAddCard = new PopupWithForm(
     checkTypes(args, ['object']);
     const [cardData] = args;
 
-    const card = new Card(cardData, selectors.card, cardDel, cardLike, cardShow);
-    card.render(data.cardList);
+    popupAddCard.loading(true, 'Сохранение...')
+    api.addCard(cardData)
+      .then(cardData => {
+        const card = new Card(cardData, selectors.card, popupConfirm.open, cardLike, cardShow, userInfo.get());
+        card.render(data.cardList);
+      })
+      .catch(console.log)
+      .finally(() => {
+        popupAddCard.loading(false);
+        popupAddCard.close();
+      });
   }
 );
 
-const popupEditProfile = new PopupWithForm(
-  selectors.popupEditProfile,
+const popupEditAvatar = new PopupWithForm(
+  selectors.popupEditAvatar,
   (...args) => {
     checkTypes(args, ['object']);
-    const [dataProfile] = args;
+    const [{ link }] = args;
 
-    data.userInfo.title.textContent = dataProfile['title'];
-    data.userInfo.description.textContent = dataProfile['description'];
+    popupEditAvatar.loading(true, 'Сохранение...')
+    api.setAvatar(link)
+      .then(userInfo.set)
+      .catch(console.log)
+      .finally(() => {
+        popupEditAvatar.loading(false);
+        popupEditAvatar.close();
+      });
   }
 );
-// ------------------------------------------------------------------------------
 
-// ------------------------- Колбэки проверки валидации -------------------------
-const hideError = (...args) => {
-  checkTypes(args, ['htmlinputelement']);
-  const [input] = args;
-
-  input.classList.remove(selectors.validate.error);
-};
-
-const showError = (...args) => {
-  checkTypes(args, ['htmlinputelement']);
-  const [input] = args;
-
-  input.classList.add(selectors.validate.error);
-};
+const popupConfirm = new PopupWithConfirm(selectors.popupConfirm, cardDel);
+const popupWithImage = new PopupWithImage(selectors.popupWithImage);
 // ------------------------------------------------------------------------------
 
 // -------------------------------- Слушатели кнопок --------------------------------
 data.buttons.editProfile.addEventListener('click', () => {
-  popupEditProfile.setValues({
-    'title': data.userInfo.title.textContent,
-    'description': data.userInfo.description.textContent,
-  });
-  popupEditProfile.setValidate(hideError, showError);
+  popupEditProfile.setValues(userInfo.get());
+  popupEditProfile.setValidate(handleHideError, handleShowError);
   popupEditProfile.open();
 });
 
 data.buttons.addCard.addEventListener('click', () => {
-  popupAddCard.setValidate(hideError, showError);
+  popupAddCard.setValidate(handleHideError, handleShowError);
   popupAddCard.open();
+});
+
+data.buttons.editAvatar.addEventListener('click', () => {
+  popupEditAvatar.setValidate(handleHideError, handleShowError);
+  popupEditAvatar.open();
 });
 // ------------------------------------------------------------------------------
 
 // -------------------------------- Колбэки Card --------------------------------
-const cardDel = (...args) => {
+function cardDel(...args) {
   checkTypes(args, ['object']);
-  const [cardData] = args;
+  const [{ cardData, cardElement, removeListeners }] = args;
 
-  console.log(`Карточка "${cardData[data.cardInfo.name]}" удалена`);
+  api.delCard(cardData._id)
+    .then((response) => {
+      removeListeners();
+      cardElement.remove();
+      console.log(response.message);
+    })
+    .catch(console.log)
+    .finally(popupConfirm.close);
 };
 
 const cardLike = (...args) => {
-  checkTypes(args, ['htmlbuttonelement']);
-  const [cardLikeButton] = args;
+  checkTypes(args, ['htmlbuttonelement', 'string', 'function']);
+  const [cardLikeButton, cardID, setLike] = args;
 
-  cardLikeButton.classList.toggle(selectors.card.isLiked);
+  if (cardLikeButton.classList.contains(selectors.card.isLiked)) {
+    api.delLike(cardID)
+      .then(setLike)
+      .catch(console.log);
+  } else {
+    api.addLike(cardID)
+      .then(setLike)
+      .catch(console.log);
+  }
 };
 
 const cardShow = (...args) => {
@@ -88,7 +133,13 @@ const cardShow = (...args) => {
 };
 // ------------------------------------------------------------------------------
 
-initialCards.forEach(cardData => {
-  const card = new Card(cardData, selectors.card, cardDel, cardLike, cardShow);
-  card.render(data.cardList, 'append');
-});
+Promise.all([api.getUser(), api.getCards()])
+  .then(([user, cards]) => {
+    userInfo.set(user);
+
+    cards.forEach(cardData => {
+      const card = new Card(cardData, selectors.card, popupConfirm.open, cardLike, cardShow, user);
+      card.render(data.cardList, 'append');
+    });
+  })
+  .catch(console.log);

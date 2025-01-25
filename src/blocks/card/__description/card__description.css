@@ -1,7 +1,15 @@
 .card__description {
-  display: flex;
+  /* display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: center; */
   background: #fff;
   padding: 25px 20px;
+
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0px 0px;
+  grid-template-areas:
+    "title button"
+    "title count";
 }

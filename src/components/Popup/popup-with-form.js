@@ -15,6 +15,7 @@ export function PopupWithForm(selectorsPopupWithForm, cbHandleSubmit) {
   this.form = document.forms[selectorsPopupWithForm.formName];
   this.inputs = [...this.form.querySelectorAll('input')];
   this.buttonSubmit = this.form.querySelector('button[type="submit"]');
+  this.buttonText = this.buttonSubmit.textContent;
 
   this.toggleButton = () => {
     this.form.checkValidity()
@@ -30,6 +31,9 @@ export function PopupWithForm(selectorsPopupWithForm, cbHandleSubmit) {
     this.inputs.forEach(
       input => {
         input.addEventListener('input', () => {
+          input.validity.patternMismatch
+            ? input.setCustomValidity(input.dataset.errorMessage)
+            : input.setCustomValidity('')
           input.validity.valid
             ? cbHideError(input)
             : cbShowError(input)
@@ -50,18 +54,26 @@ export function PopupWithForm(selectorsPopupWithForm, cbHandleSubmit) {
     checkTypes(args, ['object']);
     const [formData] = args;
 
-    Object.keys(formData).forEach(
-      (key) => {
-        this.form[key].value = formData[key];
-      }
-    );
+    this.inputs.forEach(input => {
+      input.value = formData[input.name]
+    })
+  };
+
+  this.loading = (...args) => {
+    checkTypes(args, ['boolean', 'string']);
+    const [isLoading, text] = args;
+
+    if (isLoading) {
+      this.buttonSubmit.textContent = text;
+    } else {
+      this.buttonSubmit.textContent = this.buttonText;
+    }
   };
 
   this.handleSubmit = (e) => {
     e.preventDefault();
     cbHandleSubmit(this.getValues());
     this.form.reset();
-    this.popup.close();
   };
 
   this.form.addEventListener('submit', this.handleSubmit);
@@ -73,5 +85,8 @@ export function PopupWithForm(selectorsPopupWithForm, cbHandleSubmit) {
     setValidate: {
       value: this.setValidate,
     },
+    loading: {
+      value: this.loading,
+    }
   });
 };
