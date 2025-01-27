@@ -1,13 +1,6 @@
 import { checkTypes } from '../../utils/check-types';
 import { data } from '../../utils/constants';
-/**
- * Конструктор для карточки
- * @param {object} selectors 
- * @param {function} cbDelete 
- * @param {function} cbLike 
- * @param {function} cbShow 
- * @returns {object} объект с методами create, render
- */
+
 export function Card(cardData, selectors, cbDelete, cbLike, cbShow, user) {
   checkTypes(arguments, ['object', 'object', 'function', 'function', 'function', 'object']);
 

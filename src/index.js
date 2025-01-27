@@ -1,8 +1,9 @@
 import './index.css';
 import { Card } from "./components/Card/card";
 import { checkTypes } from "./utils/check-types";
+import { clearValidate, enableValidate } from './components/Validate/validate';
 import { data } from "./utils/constants";
-import { handleHideError, handleShowError } from './components/Validate/validate';
+import { loader } from './components/Loader/loader';
 import { PopupWithConfirm } from './components/Popup/popup-with-confirm';
 import { PopupWithForm } from "./components/Popup/popup-with-form";
 import { PopupWithImage } from "./components/Popup/popup-with-image";
@@ -24,16 +25,18 @@ const popupEditProfile = new PopupWithForm(
     checkTypes(args, ['object']);
     const [userData] = args;
 
-    popupEditProfile.loading(true, 'Сохранение...');
+    popupEditProfileLoader(true, 'Сохранение...');
     api.setUser(userData)
       .then(userInfo.set)
       .catch(console.log)
       .finally(() => {
-        popupEditProfile.loading(false);
+        popupEditProfileLoader(false);
         popupEditProfile.close();
       });
   }
 );
+const popupEditProfileLoader = loader(popupEditProfile.buttonSubmit);
+enableValidate(popupEditProfile.form, popupEditProfile.inputs, popupEditProfile.buttonSubmit);
 
 const popupAddCard = new PopupWithForm(
   selectors.popupAddCard,
@@ -41,7 +44,7 @@ const popupAddCard = new PopupWithForm(
     checkTypes(args, ['object']);
     const [cardData] = args;
 
-    popupAddCard.loading(true, 'Сохранение...')
+    popupAddCardLoader(true, 'Сохранение...')
     api.addCard(cardData)
       .then(cardData => {
         const card = new Card(cardData, selectors.card, popupConfirm.open, cardLike, cardShow, userInfo.get());
@@ -49,11 +52,13 @@ const popupAddCard = new PopupWithForm(
       })
       .catch(console.log)
       .finally(() => {
-        popupAddCard.loading(false);
+        popupAddCardLoader(false);
         popupAddCard.close();
       });
   }
 );
+const popupAddCardLoader = loader(popupAddCard.buttonSubmit);
+enableValidate(popupAddCard.form, popupAddCard.inputs, popupAddCard.buttonSubmit);
 
 const popupEditAvatar = new PopupWithForm(
   selectors.popupEditAvatar,
@@ -61,16 +66,18 @@ const popupEditAvatar = new PopupWithForm(
     checkTypes(args, ['object']);
     const [{ link }] = args;
 
-    popupEditAvatar.loading(true, 'Сохранение...')
+    popupEditAvatarLoader(true, 'Сохранение...')
     api.setAvatar(link)
       .then(userInfo.set)
       .catch(console.log)
       .finally(() => {
-        popupEditAvatar.loading(false);
+        popupEditAvatarLoader(false);
         popupEditAvatar.close();
       });
   }
 );
+const popupEditAvatarLoader = loader(popupEditAvatar.buttonSubmit);
+enableValidate(popupEditAvatar.form, popupEditAvatar.inputs, popupEditAvatar.buttonSubmit);
 
 const popupConfirm = new PopupWithConfirm(selectors.popupConfirm, cardDel);
 const popupWithImage = new PopupWithImage(selectors.popupWithImage);
@@ -79,17 +86,19 @@ const popupWithImage = new PopupWithImage(selectors.popupWithImage);
 // -------------------------------- Слушатели кнопок --------------------------------
 data.buttons.editProfile.addEventListener('click', () => {
   popupEditProfile.setValues(userInfo.get());
-  popupEditProfile.setValidate(handleHideError, handleShowError);
+  clearValidate(popupEditProfile.form, popupEditProfile.inputs, popupEditProfile.buttonSubmit);
   popupEditProfile.open();
 });
 
 data.buttons.addCard.addEventListener('click', () => {
-  popupAddCard.setValidate(handleHideError, handleShowError);
+  popupAddCard.form.reset();
+  clearValidate(popupAddCard.form, popupAddCard.inputs, popupAddCard.buttonSubmit);
   popupAddCard.open();
 });
 
 data.buttons.editAvatar.addEventListener('click', () => {
-  popupEditAvatar.setValidate(handleHideError, handleShowError);
+  popupEditAvatar.form.reset();
+  clearValidate(popupEditAvatar.form, popupEditAvatar.inputs, popupEditAvatar.buttonSubmit);
   popupEditAvatar.open();
 });
 // ------------------------------------------------------------------------------
