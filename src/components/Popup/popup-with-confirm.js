@@ -25,9 +25,5 @@ export function PopupWithConfirm(selectorsPopupWithConfirm, cbHandleSubmit) {
 
   this.form.addEventListener('submit', this.handleSubmit);
 
-  return Object.create(this.popup, {
-    open: {
-      value: this.open,
-    },
-  });
+  return Object.create(this.popup, Object.getOwnPropertyDescriptors(this));
 };

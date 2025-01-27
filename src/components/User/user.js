@@ -17,9 +17,4 @@ export function UserInfo(user) {
     data.userInfo.description.textContent = this.user.about;
     data.userInfo.avatar.style.backgroundImage = `url(${this.user.avatar})`;
   };
-
-  return {
-    get: this.get,
-    set: this.set,
-  };
 };

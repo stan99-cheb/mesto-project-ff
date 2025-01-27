@@ -1,12 +1,5 @@
 import { checkTypes } from "../../utils/check-types";
-/**
- * Конструктор для Попап
- * @param {htmldivelement} element 
- * @param {htmlbuttonelement} buttonClose 
- * @param {object} selectors 
- * @param {boolean} isAnimated 
- * @returns {object} объект с методами open, close
- */
+
 export function Popup(element, selectors, isAnimated) {
   checkTypes(arguments, ['htmldivelement', 'object', 'boolean']);
 
@@ -34,9 +27,4 @@ export function Popup(element, selectors, isAnimated) {
   };
 
   this.buttonClose.addEventListener('click', this.close);
-
-  return {
-    open: this.open,
-    close: this.close,
-  };
 };

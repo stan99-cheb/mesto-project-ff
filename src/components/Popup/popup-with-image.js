@@ -2,11 +2,7 @@ import { checkTypes } from "../../utils/check-types";
 import { data } from "../../utils/constants";
 import { Popup } from "./popup";
 import { selectors } from "../../utils/selectors";
-/**
- * Конструктор для попапа с картинкой
- * @param {object} selectorsPopupWithImage 
- * @returns {object} объект с методами open, close, show
- */
+
 export function PopupWithImage(selectorsPopupWithImage) {
   checkTypes(arguments, ['object']);
 
@@ -24,9 +20,5 @@ export function PopupWithImage(selectorsPopupWithImage) {
     this.caption.textContent = cardImageData[data.cardInfo.name];
   };
 
-  return Object.create(this.popup, {
-    show: {
-      value: this.show,
-    },
-  });
+  return Object.create(this.popup, Object.getOwnPropertyDescriptors(this));
 };
