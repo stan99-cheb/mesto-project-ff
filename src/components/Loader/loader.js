@@ -1,6 +1,6 @@
 import { checkTypes } from "../../utils/check-types";
 
-export const loader = (...args) => {
+export const renderLoading = (...args) => {
   checkTypes(args, ['htmlbuttonelement']);
   const [element] = args;
 

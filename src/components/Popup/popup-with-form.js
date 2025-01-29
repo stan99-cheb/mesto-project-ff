@@ -30,6 +30,7 @@ export function PopupWithForm(selectorsPopupWithForm, cbHandleSubmit, isValidate
   this.handleSubmit = (e) => {
     e.preventDefault();
     cbHandleSubmit(this.getValues());
+    this.popup.close();
     this.form.reset();
   };
 

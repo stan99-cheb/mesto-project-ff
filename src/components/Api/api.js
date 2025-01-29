@@ -7,25 +7,24 @@ const HEADERS = {
   },
 };
 
-const request = (endpoint, options) =>
-  fetch(`${BASE_URL}${endpoint}`, options);
-
 const checkResponse = (res) => {
   if (res.ok) return res.json();
   throw new Error(res.status.toString());
 };
 
+const request = (endpoint, options) =>
+  fetch(`${BASE_URL}${endpoint}`, options)
+    .then(checkResponse);
+
 export const getCards = () =>
   request('/cards', {
     ...HEADERS
-  })
-    .then(checkResponse);
+  });
 
 export const getUser = () =>
   request('/users/me', {
     ...HEADERS
-  })
-    .then(checkResponse);
+  });
 
 export const setUser = (user) =>
   request('/users/me', {
@@ -35,8 +34,7 @@ export const setUser = (user) =>
       name: user.name,
       about: user.about,
     }),
-  })
-    .then(checkResponse);
+  });
 
 export const addCard = (card) =>
   request('/cards', {
@@ -46,29 +44,25 @@ export const addCard = (card) =>
       name: card.name,
       link: card.link,
     }),
-  })
-    .then(checkResponse);
+  });
 
 export const delCard = (id) =>
   request(`/cards/${id}`, {
     method: 'DELETE',
     ...HEADERS,
-  })
-    .then(checkResponse);
+  });
 
 export const addLike = (id) =>
   request(`/cards/likes/${id}`, {
     method: 'PUT',
     ...HEADERS,
-  })
-    .then(checkResponse);
+  });
 
 export const delLike = (id) =>
   request(`/cards/likes/${id}`, {
     method: 'DELETE',
     ...HEADERS,
-  })
-    .then(checkResponse);
+  });
 
 export const setAvatar = (link) =>
   request('/users/me/avatar', {
@@ -77,5 +71,4 @@ export const setAvatar = (link) =>
     body: JSON.stringify({
       avatar: link,
     }),
-  })
-    .then(checkResponse);
+  });
