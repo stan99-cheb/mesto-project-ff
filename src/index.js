@@ -27,7 +27,12 @@ const popupEditProfile = new PopupWithForm(
 
     renderLoadingFormEditProfile(true, 'Сохранение...');
     api.setUser(userData)
-      .then(userInfo.set)
+      .then(userData => {
+        userInfo.set(userData);
+
+        popupEditProfile.form.reset();
+        popupEditProfile.close();
+      })
       .catch(console.log)
       .finally(() => {
         renderLoadingFormEditProfile(false);
@@ -48,6 +53,9 @@ const popupAddCard = new PopupWithForm(
       .then(cardData => {
         const card = new Card(cardData, selectors.card, popupConfirm.open, cardLike, cardShow, userInfo.get());
         card.render(data.cardList);
+
+        popupAddCard.form.reset();
+        popupAddCard.close();
       })
       .catch(console.log)
       .finally(() => {
@@ -66,7 +74,12 @@ const popupEditAvatar = new PopupWithForm(
 
     renderLoadingFormEditAvatar(true, 'Сохранение...')
     api.setAvatar(link)
-      .then(userInfo.set)
+      .then(userData => {
+        userInfo.set(userData);
+
+        popupEditAvatar.form.reset();
+        popupEditAvatar.close();
+      })
       .catch(console.log)
       .finally(() => {
         renderLoadingFormEditAvatar(false);
