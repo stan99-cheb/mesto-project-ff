@@ -54,6 +54,6 @@ export const selectors = {
     isAnimated: true,
   },
   validate: {
-    error: 'popup__input-error',
+    inputError: 'popup__input_type_error',
   },
 };

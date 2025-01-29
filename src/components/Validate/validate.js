@@ -1,4 +1,5 @@
 import { checkTypes } from "../../utils/check-types";
+import { selectors } from "../../utils/selectors";
 
 const handleHideError = (...args) => {
   checkTypes(args, ['htmlinputelement']);
@@ -6,7 +7,7 @@ const handleHideError = (...args) => {
 
   const small = input.nextElementSibling;
   if (small && small.tagName === 'SMALL') {
-    input.classList.remove('popup__input_type_error');
+    input.classList.remove(selectors.validate.inputError);
     small.textContent = '';
   }
 };
@@ -17,7 +18,7 @@ const handleShowError = (...args) => {
 
   const small = input.nextElementSibling;
   if (small && small.tagName === 'SMALL') {
-    input.classList.add('popup__input_type_error');
+    input.classList.add(selectors.validate.inputError);
     small.textContent = input.validationMessage;
   }
 };
